@@ -47,7 +47,6 @@ Share this link with your friends, clients, or bandmates!
 - **Drag & drop** any number of audio files (`.wav`, `.aif`, `.aiff`, `.flac`, `.mp3`, `.m4a`, `.aac`, `.ogg`) or an entire folder.
 - **Smart Master Detection**: Automatically selects files containing **`MASTER`** or **`MASTERED`** while **strictly excluding anything containing `UNMASTERED`**.
 - Filter toggle lets you compare unmastered mixes or stems if desired.
-- **Built-in Demo Shootout**: Click **"✨ Try Demo Shootout"** to immediately test with 4 synthesized master revisions (Warm Analog, Bright Air, Punchy Club, and Balanced Reference) with zero uploads!
 
 ### 🙈 Strictly Blind Arena: "Option 1" vs "Option 2"
 - **Zero Giveaways**: All file names, formats (e.g. WAV 24-bit 96k vs MP3), sample rates, bit depths, and sizes are completely hidden.

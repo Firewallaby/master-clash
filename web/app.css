@@ -335,7 +335,7 @@ kbd {
   margin-top: 1.5rem;
 }
 
-.quick-presets {
+.master-filter-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -349,34 +349,6 @@ kbd {
 .filter-toggle-wrapper {
   display: flex;
   align-items: center;
-}
-
-.chip {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  padding: 0.4rem 0.9rem;
-  border-radius: var(--radius-full);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.chip:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.chip-action {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.3);
-  color: var(--accent-gold);
-  font-weight: 600;
-}
-
-.chip-action:hover {
-  background: rgba(245, 158, 11, 0.22);
-  box-shadow: 0 0 15px var(--accent-gold-glow);
 }
 
 /* Progress bar */

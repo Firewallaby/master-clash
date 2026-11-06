@@ -359,86 +359,6 @@ class AudioEngine {
 const audio = new AudioEngine();
 
 /* ==========================================================================
-   Synthetic Demo Master Generator (0-upload instant test)
-   ========================================================================== */
-
-function generateDemoMasters(audioCtx) {
-  const sr = audioCtx.sampleRate || 44100;
-  const dur = 30.0;
-  const total = Math.floor(sr * dur);
-
-  // Musical chord notes in Hz (C major / A minor progression)
-  const chords = [
-    [261.63, 329.63, 392.00], // C
-    [196.00, 246.94, 293.66], // G
-    [220.00, 261.63, 329.63], // Am
-    [174.61, 220.00, 261.63], // F
-  ];
-
-  const profiles = [
-    { name: "SummerGroove_MASTER_v1_balanced.wav", bassGain: 1.0, trebleGain: 1.0, comp: 1.0 },
-    { name: "SummerGroove_MASTERED_v2_warm_analog.wav", bassGain: 1.6, trebleGain: 0.85, comp: 1.1 },
-    { name: "SummerGroove_MASTERED_v3_bright_air.wav", bassGain: 0.95, trebleGain: 1.7, comp: 1.05 },
-    { name: "SummerGroove_MASTER_v4_punchy_club.wav", bassGain: 1.3, trebleGain: 1.25, comp: 1.4 }
-  ];
-
-  const tracks = [];
-
-  profiles.forEach((prof, idx) => {
-    const buf = audioCtx.createBuffer(2, total, sr);
-    const left = buf.getChannelData(0);
-    const right = buf.getChannelData(1);
-
-    for (let i = 0; i < total; i++) {
-      const t = i / sr;
-      const chordIdx = Math.floor((t % 8) / 2);
-      const chord = chords[chordIdx];
-
-      // Chord synth
-      let val = 0;
-      chord.forEach((freq, fIdx) => {
-        val += Math.sin(2 * Math.PI * freq * t) * 0.12;
-        val += Math.sin(4 * Math.PI * freq * t) * (0.04 * prof.trebleGain);
-      });
-
-      // Bass note
-      const bassFreq = chord[0] / 2;
-      val += Math.sin(2 * Math.PI * bassFreq * t) * (0.22 * prof.bassGain);
-
-      // Drum kick & snare pulse
-      const beat = (t * 2) % 1;
-      if (beat < 0.08) {
-        val += Math.sin(2 * Math.PI * 65 * beat * 12) * (0.35 * prof.comp);
-      }
-
-      // Stereo width
-      left[i] = Math.max(-0.95, Math.min(0.95, val * 0.85));
-      right[i] = Math.max(-0.95, Math.min(0.95, val * 0.9));
-    }
-
-    const mid = dur / 2.0;
-    const clipStart = mid - 7.5;
-    const slice = sliceAudioBuffer(audioCtx, buf, clipStart, 15.0);
-
-    tracks.push({
-      id: `demo_${idx}`,
-      filename: prof.name,
-      duration: dur,
-      sampleRate: sr,
-      channels: 2,
-      formatDesc: "WAV 16-bit 44.1kHz Stereo",
-      sizeMb: 5.2,
-      fullBuffer: buf,
-      slicedBuffer: slice,
-      clipStart: clipStart,
-      clipDuration: 15.0
-    });
-  });
-
-  return tracks;
-}
-
-/* ==========================================================================
    App UI & Client-Side Tournament Controller
    ========================================================================== */
 
@@ -482,7 +402,6 @@ const AppUI = {
       btnSelectFiles: document.getElementById('btn-select-files'),
       btnSelectFolder: document.getElementById('btn-select-folder'),
       toggleMasterFilter: document.getElementById('toggle-master-filter'),
-      btnPresetDemo: document.getElementById('btn-preset-demo'),
       decodeProgressContainer: document.getElementById('decode-progress-container'),
       decodeProgressText: document.getElementById('decode-progress-text'),
       decodeProgressPct: document.getElementById('decode-progress-pct'),
@@ -601,12 +520,6 @@ const AppUI = {
       if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
         this.processUploadedFiles(Array.from(e.dataTransfer.files));
       }
-    });
-
-    // Demo samples
-    this.elements.btnPresetDemo.addEventListener('click', () => {
-      audio.ensureContext();
-      this.loadDemoTracks();
     });
 
     // Clear & Toggle all
@@ -885,16 +798,6 @@ const AppUI = {
     }
   },
 
-  loadDemoTracks() {
-    const ctx = audio.ensureContext();
-    this.showToast("Synthesizing 4 Demo Master Revisions...");
-    const demoTracks = generateDemoMasters(ctx);
-    this.state.tracks = demoTracks;
-    this.state.selectedTrackIds = new Set(demoTracks.map(t => t.id));
-    this.renderTrackList(0);
-    this.showToast("4 Demo Masters loaded! Ready for shootout.");
-  },
-
   recomputeSlices(newDuration) {
     const ctx = audio.ensureContext();
     this.state.tracks.forEach(track => {
@@ -1159,17 +1062,10 @@ const AppUI = {
     `;
 
     // Setup full track audio player
-    if (winner.file) {
-      const blobUrl = URL.createObjectURL(winner.file);
-      this.elements.winnerAudioPlayer.src = blobUrl;
-      this.elements.btnDownloadWinner.href = blobUrl;
-      this.elements.btnDownloadWinner.download = winner.filename;
-      this.elements.btnDownloadWinner.style.display = 'inline-flex';
-    } else {
-      // Demo synthesis playback
-      this.elements.btnDownloadWinner.style.display = 'none';
-      this.elements.winnerAudioPlayer.src = "";
-    }
+    const blobUrl = URL.createObjectURL(winner.file);
+    this.elements.winnerAudioPlayer.src = blobUrl;
+    this.elements.btnDownloadWinner.href = blobUrl;
+    this.elements.btnDownloadWinner.download = winner.filename;
 
     // Render Elimination History
     this.elements.tournamentHistoryList.innerHTML = '';
